@@ -100,11 +100,11 @@ rho = 1; K = 3; priority sites = {6,7}
 
 All other overlap entries are zero. A selected pair loses overlap utility to discourage redundant choices; overlaps do not represent measured catchment areas. The objective is
 
-$$
+```math
 U_\lambda(x)=\sum_i (b_i+\lambda v_i)x_i
  -\rho\sum_{i<j}r_{ij}x_ix_j,
 \quad \sum_i x_i=K,\quad x_6+x_7\ge1.
-$$
+```
 
 The classical reference enumerates the feasible combinations, retains all tied optima and reports the full feasible set. There are 36 feasible assignments when `K=3`; separate encoding tests check all 256 assignments, including infeasible ones. Lambda changes the objective, so do not interpret utilities at different lambda values as an improvement under one fixed metric.
 
@@ -124,30 +124,30 @@ Lambda is a chosen priority weight, not an objective definition of fairness. The
 
 Let `s_i=b_i+lambda*v_i`. Minimize
 
-$$
+```math
 E(x)=-U_\lambda(x)+P(\sum_i x_i-K)^2+P(1-x_6)(1-x_7),
 \qquad P=1+\sum_i|s_i|+\rho\sum_{i<j}|r_{ij}|.
-$$
+```
 
 For any two binary assignments, each linear or quadratic monomial changes by at most one. Their utility difference is therefore at most `B=sum |s_i| + rho*sum |r_ij|`. Every infeasible assignment incurs at least `P=1+B`, whereas a feasible one has zero penalty. Thus every infeasible assignment costs more than every feasible one. Input validation rejects impossible allocations and invalid weights. This guarantee concerns the global minimum, not every sample of a shallow approximate circuit.
 
 Using `x_i²=x_i`, write `E=c+sum a_i*x_i+sum d_ij*x_i*x_j`, with
 
-$$
+```math
 \begin{aligned}
 c&=P(K^2+1),\\
 a_i&=-s_i+P(1-2K)-P\,\mathbf1_{i\in\{6,7\}},\\
 d_{ij}&=\rho r_{ij}+2P+P\,\mathbf1_{(i,j)=(6,7)}.
 \end{aligned}
-$$
+```
 
 For `x_i=(1-Z_i)/2`, the diagonal cost is `E=offset+sum h_i*Z_i+sum J_ij*Z_i*Z_j`, where
 
-$$
+```math
 \mathrm{offset}=c+\frac12\sum_i a_i+\frac14\sum_{i<j}d_{ij},\qquad
 h_i=-\frac{a_i}{2}-\frac14\sum_{j\ne i}d_{ij},\qquad
 J_{ij}=\frac{d_{ij}}4.
-$$
+```
 
 The nonconstant terms are a Qiskit `SparsePauliOp`. The implementation retains the offset and normalizes by a positive scale based on the largest absolute nonconstant Pauli coefficient. Multiplication by this positive scale and restoration of the offset recover the original energy; reported utility and regret remain in the original proxy units. The offset affects energy accounting but only a global phase in cost evolution, so it can be omitted from the circuit.
 
