@@ -7,7 +7,7 @@ All scores, names, coordinates, city diagrams and hardware noise are **synthetic
 ## Team
 
 - **[Alexander Jacob](https://www.linkedin.com/in/alexander-jacob-0471aa295/)**
-- **Shravan**
+- **[Shravan Suresh](https://www.linkedin.com/in/shravan-suresh-63b8aa373/)**
 
 ## Run locally
 
