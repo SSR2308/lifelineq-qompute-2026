@@ -97,6 +97,8 @@ STYLE = f"""<style>
 .stTabs [data-baseweb="tab"] p {{font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 600;
   font-size: 1.05rem;}}
 h2, h3 {{letter-spacing: -.01em;}}
+[class*="st-key-lit_"] [data-testid="stMetricValue"] {{color: {LIT};}}
+[class*="st-key-cool_"] [data-testid="stMetricValue"] {{color: {COOL};}}
 [data-testid="stBaseButton-primary"], [data-testid="stBaseButton-primary"] p {{color: {NIGHT}; font-weight: 600;}}
 @media (max-width: 640px) {{.block-container {{padding-top: 3.5rem;}} .lq-bar {{flex-direction: column;}}}}
 </style>"""
@@ -445,7 +447,7 @@ def evidence_view(document: dict, scenario, config: ExperimentConfig, noise: str
     st.write("We checked every answer the circuit gave, including the ones that break the rules, "
              "against the exact best answer and two simple classical methods.")
     c1, c2, c3 = st.columns(3)
-    c1.metric("Best possible score", number(document["exact"]["utility"], 0))
+    c1.container(key="lit_best").metric("Best possible score", number(document["exact"]["utility"], 0))
     c2.metric("Greedy method's score", number(document["greedy"]["utility"], 0))
     c3.metric("Valid picks to choose from", document["exact"]["feasible_count"])
     st.dataframe(metric_table(document, noise), hide_index=True, width="stretch")
@@ -614,10 +616,10 @@ def main() -> None:
         with statistics:
             score = None if no_sample else utility(display_bits, scenario, weight)
             valid = False if no_sample else feasible(display_bits, scenario, k)
-            st.metric("Score", number(score, 0))
+            st.container(key="lit_score").metric("Score", number(score, 0))
             st.metric("Follows the rules", "No answer" if no_sample else "Yes" if valid else "No")
             st.metric("Points short of best", number(exact["utility"] - score, 0) if valid else "—")
-            st.metric("Valid quantum answers",
+            st.container(key="cool_quantum").metric("Valid quantum answers",
                       percent(execution["metrics"]["feasible_rate"]) if execution else "—",
                       help="Share of the quantum circuit's answers (optimized compile, chosen noise "
                            "level) that follow the rules.")
