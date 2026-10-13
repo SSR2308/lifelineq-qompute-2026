@@ -9,6 +9,38 @@ All scores, names, coordinates, city diagrams and hardware noise are **synthetic
 - **[Alexander Jacob](https://www.linkedin.com/in/alexander-jacob-0471aa295/)**
 - **[Shravan Suresh](https://www.linkedin.com/in/shravan-suresh-63b8aa373/)**
 
+## Key findings
+
+- **The "optimal" answer is a value choice.** Changing one priority weight changes which shelters get power. At λ = 0 the exact optimum powers Aster Hall, Dawn Commons and Grove Haven; at λ = 2 it powers Fern Pavilion, Grove Haven and Harbor Hall. At λ = 1 six different allocations tie exactly, so the math cannot decide and a person must.
+- **Some shelters are never served.** In the base scenario, Birch Center and Cedar Library receive no unit at any weight from 0 to 2, because they overlap with Aster Hall.
+- **Simple classical methods beat QAOA here.** A noiseless one-layer QAOA circuit sampled a best allocation about 3.6% of the time (5.4% with two layers). Picking uniformly among valid allocations did so about 16.8% of the time, and a greedy method found the exact optimum in all nine scenario/weight cases. No quantum advantage is claimed.
+- **Noise wipes out the gain from a deeper circuit.** Rule-following samples fell from 22% to 16% (one layer) and from 33% to 14% (two layers) between no noise and high noise.
+- **Smarter compilation cut gates but not reliably errors.** Searching four compiler seeds removed two-qubit gates in 24 of 30 base fits (mean 102 → 89 at one layer), but changes in allocation quality were small and mixed.
+
+![Heatmap of which shelters receive backup power as the priority weight changes](docs/figures/priorities.png)
+
+![Bar chart comparing how often each method finds the best allocation](docs/figures/methods.png)
+
+![Line chart of rule-following samples under increasing noise](docs/figures/noise.png)
+
+Figures are drawn from the checked-in results by `python scripts/make_figures.py` (needs `matplotlib`). Full numbers, spreads and caveats are in [results/REPORT.md](results/REPORT.md).
+
+## Societal impact and responsible use
+
+**Who defines "optimal"?** The objective rewards benefit, extra priority for high-need shelters, and a penalty for overlapping service. Each of those is a judgment. λ is not a measure of fairness; it is a dial that encodes whose needs count more, and the figure above shows it decides who receives power. In a real emergency those choices belong to accountable officials and the affected communities, not to whoever writes the cost function.
+
+**Who gets left out?** An "optimal" allocation can systematically exclude the same places. Birch Center and Cedar Library are never powered in our base scenario, and people who depend on them would receive nothing under this model. Detecting that pattern requires looking across many priority settings, not only at one optimum. We would want any real tool to report who is excluded alongside what is selected.
+
+**When should an algorithm decide?** At λ = 1 six allocations tie exactly. An algorithm would silently break that tie; we think a person should. More broadly, a tool like this should present trade-offs to decision-makers rather than make the allocation itself.
+
+**Can a noisy quantum answer be trusted?** Not without checking. A shallow QAOA circuit often proposed allocations that broke the rules: in more than half of the recorded quantum runs, its single most frequent answer was invalid. Every quantum answer in this project is verified against an exact classical solution, a greedy baseline and random sampling, and each saved result carries its code fingerprint so it can be audited. For decisions that affect people's safety, unverified quantum output should not be used.
+
+**Who benefits from quantum optimization?** If quantum methods eventually outperform classical ones, the first access will likely go to organizations that can pay for advanced hardware, not to the under-resourced communities that face the hardest allocation problems. Free cloud access has opened learning to students like us, but equitable access to useful machines remains an open question.
+
+**Is the computation justified?** At eight shelters the exact answer takes a fraction of a second on a laptop. We use this small instance deliberately so every claim can be checked. Spending quantum or classical resources on a harder method only makes sense once it clearly beats simpler tools.
+
+**Limits of this prototype.** All names, scores, coordinates and noise are synthetic. Utility is a proxy, not lives saved or energy delivered. A real system would need validated demand and travel data, electrical engineering review, community input, an appeals process and a tested non-algorithmic fallback.
+
 ## Run locally
 
 The tested environment is **Python 3.10.11 on Windows**, with Qiskit 2.5.2, Qiskit Aer 0.17.2, NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3, Plotly 7.1.0, Streamlit 1.65.0 and pytest 9.1.1. Run commands from the repository root. Top-level dependencies are pinned in `requirements.txt`; `requirements-lock.txt` records the full tested environment. A virtual environment keeps the project independent of other Python installations. The macOS/Linux instructions use the same pinned packages, but those operating systems were not tested in this build.
