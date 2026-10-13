@@ -122,7 +122,7 @@ Lambda is a chosen priority weight, not an objective definition of fairness. The
 
 ## QUBO and Hamiltonian derivation
 
-Let `s_i=b_i+lambda*v_i`. Minimize
+Let  `s_i=b_i+lambda*v_i`. Minimize
 
 ```math
 E(x)=-U_\lambda(x)+P(\sum_i x_i-K)^2+P(1-x_6)(1-x_7),
@@ -190,7 +190,7 @@ Every fit has an unrouted ideal execution, plus both routed compilation strategi
 | Exact-optimum probability | Shots at any tied exact feasible optimum / all shots. |
 | Mean feasible utility | Count-weighted utility conditional on feasibility. |
 | Mean feasible regret | Exact optimum minus mean feasible utility at the same scenario and lambda. |
-| Best observed feasible regret | Exact optimum minus best feasible utility seen; a diagnostic strongly affected by shot budget. |
+| Best observed feasible regret | Exact optimum minus best feasible utility seen; a diagnostic strongly affected   by shot budget. |
 | No-feasible failure | No feasible shot; conditional utility/regret and the best feasible sample are undefined. |
 
 The most frequent raw sample is shown separately and may be infeasible. A labeled classical fallback, if shown, is not a quantum sample. Feasibility filtering is classical post-processing, and discarding invalid shots must never hide their rate.
