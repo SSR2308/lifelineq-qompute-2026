@@ -1,0 +1,9 @@
+scenario_name,weight,p,method,noise,feasible_rate_mean,feasible_rate_std,feasible_rate_count,optimal_probability_mean,optimal_probability_std,optimal_probability_count,conditional_mean_regret_mean,conditional_mean_regret_std,conditional_mean_regret_count,best_feasible_regret_mean,best_feasible_regret_std,best_feasible_regret_count,two_qubit_gates_mean,two_qubit_gates_std,two_qubit_gates_count,depth_mean,depth_std,depth_count,simulation_seconds_mean,simulation_seconds_std,simulation_seconds_count
+base,1.0,1,ideal,zero,0.2255859375,,1,0.0380859375,,1,2.471861471861473,,1,0.0,,1,56.0,,1,48.0,,1,0.03256690001580864,,1
+base,1.0,1,ordinary,high,0.1494140625,,1,0.025390625,,1,2.732026143790847,,1,0.0,,1,106.0,,1,115.0,,1,0.03413189994171262,,1
+base,1.0,1,ordinary,low,0.181640625,,1,0.0322265625,,1,2.483870967741936,,1,0.0,,1,106.0,,1,115.0,,1,0.037883899989537895,,1
+base,1.0,1,ordinary,zero,0.2236328125,,1,0.033203125,,1,2.877729257641924,,1,0.0,,1,106.0,,1,115.0,,1,0.02874470001552254,,1
+base,1.0,1,searched,high,0.15234375,,1,0.0322265625,,1,2.2564102564102555,,1,0.0,,1,89.0,,1,101.0,,1,0.031954400008544326,,1
+base,1.0,1,searched,low,0.1875,,1,0.03515625,,1,2.703125,,1,0.0,,1,89.0,,1,101.0,,1,0.030778199899941683,,1
+base,1.0,1,searched,zero,0.259765625,,1,0.0380859375,,1,2.6766917293233092,,1,0.0,,1,89.0,,1,101.0,,1,0.024391500046476722,,1
+base,1.0,1,uniform_feasible,zero,1.0,,1,0.1796875,,1,2.5546875,,1,0.0,,1,,,0,,,0,0.0022506999084725976,,1

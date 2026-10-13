@@ -1,0 +1,11 @@
+{
+  "name": "demand_shift",
+  "description": "Predefined synthetic perturbation fixed before benchmarking: benefit shifts at sites 0, 2, 3, 5, and 7; priorities shift at 1, 4, 5, and 6. No measured outcomes informed these values.",
+  "benefit": [9, 9, 9, 6, 6, 6, 4, 4],
+  "priority": [1, 2, 2, 4, 7, 6, 8, 10],
+  "overlaps": [[0, 1, 6], [0, 2, 5], [1, 2, 4], [6, 7, 5], [3, 4, 2], [4, 5, 3]],
+  "names": ["Aster Hall", "Birch Center", "Cedar Library", "Dawn Commons", "Elm House", "Fern Pavilion", "Grove Haven", "Harbor Hall"],
+  "coordinates": [[1, 7], [3, 8], [3, 5.7], [5, 7], [6, 4.5], [8, 6], [2, 2], [7, 1.5]],
+  "priority_sites": [6, 7],
+  "rho": 1
+}

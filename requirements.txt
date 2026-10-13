@@ -1,0 +1,9 @@
+# Tested together on Python 3.10.11. See requirements-lock.txt for full environment.
+qiskit==2.5.2
+qiskit-aer==0.17.2
+numpy==2.2.6
+scipy==1.15.3
+pandas==2.3.3
+plotly==7.1.0
+streamlit==1.65.0
+pytest==9.1.1

@@ -218,3 +218,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# LifelineQ project-specific
+.venv/
+__pycache__/
+.pytest_cache/
+.pytest_tmp/
+.pytest_app_tmp/
+*.pyc
+.streamlit/secrets.toml
+results/live/
+*.log

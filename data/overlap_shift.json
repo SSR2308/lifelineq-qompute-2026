@@ -1,0 +1,11 @@
+{
+  "name": "overlap_shift",
+  "description": "Predefined synthetic perturbation fixed before benchmarking: changed overlap strengths and two additional overlaps (2,3) and (5,7). No measured outcomes informed these values.",
+  "benefit": [10, 9, 8, 7, 6, 5, 4, 3],
+  "priority": [1, 1, 2, 4, 6, 7, 9, 10],
+  "overlaps": [[0, 1, 4], [0, 2, 6], [1, 2, 3], [6, 7, 6], [3, 4, 3], [4, 5, 2], [2, 3, 2], [5, 7, 2]],
+  "names": ["Aster Hall", "Birch Center", "Cedar Library", "Dawn Commons", "Elm House", "Fern Pavilion", "Grove Haven", "Harbor Hall"],
+  "coordinates": [[1, 7], [3, 8], [3, 5.7], [5, 7], [6, 4.5], [8, 6], [2, 2], [7, 1.5]],
+  "priority_sites": [6, 7],
+  "rho": 1
+}
