@@ -58,22 +58,22 @@ def selectbox(app, label):
 
 def test_saved_evidence_is_visible_and_controls_clear_mismatched_data(saved_app):
     app, document = saved_app
-    assert "Saved benchmark run" in app.success[0].value
-    assert metric(app, "Selected allocation utility") == "36.00"
+    assert "Saved run:" in app.success[0].value
+    assert metric(app, "Score") == "36"
     assert len(app.get("download_button")) == 2
     assert {tab.label for tab in app.tabs} == {
         "Allocation & evidence", "Explore priorities", "Stress-test quantum noise"
     }
 
-    selectbox(app, "Allocation shown on the city diagram").select(
-        "Compiler search · best feasible sample").run()
+    selectbox(app, "Show on the map").select(
+        "Quantum: best valid answer").run()
     app.select_slider[0].set_value(2.).run()
     assert not app.exception
     assert not app.success
-    assert any("No matching quantum evidence" in item.value for item in app.info)
-    assert metric(app, "Selected allocation utility") == "59.00"
-    assert metric(app, "Quantum feasible sample rate") == "—"
-    assert selectbox(app, "Allocation shown on the city diagram").options == ["Exact classical optimum"]
+    assert any("No saved quantum run matches" in item.value for item in app.info)
+    assert metric(app, "Score") == "59"
+    assert metric(app, "Valid quantum answers") == "—"
+    assert selectbox(app, "Show on the map").options == ["Best possible (exact)"]
     assert len(app.get("download_button")) == 0
 
 
@@ -98,18 +98,18 @@ def test_live_run_survives_noise_selection_but_not_changed_allocation(saved_app,
     assert "1,024 shots" in app.success[0].value
     assert len(captured) == 1
 
-    selectbox(app, "Evaluation noise").select("high").run()
+    selectbox(app, "Quantum noise level").select("high").run()
     assert not app.exception
     assert "Live run" in app.success[0].value
     searched = next(row for row in quick["executions"]
                     if row["method"] == "searched" and row["noise"] == "high")
-    assert metric(app, "Quantum feasible sample rate") == f"{100 * searched['metrics']['feasible_rate']:.1f}%"
+    assert metric(app, "Valid quantum answers") == f"{100 * searched['metrics']['feasible_rate']:.1f}%"
 
     app.slider[0].set_value(4).run()
     assert not app.exception
     assert not app.success
-    assert metric(app, "Quantum feasible sample rate") == "—"
-    assert any("No matching quantum evidence" in item.value for item in app.info)
+    assert metric(app, "Valid quantum answers") == "—"
+    assert any("No saved quantum run matches" in item.value for item in app.info)
 
 
 def test_no_feasible_sample_does_not_silently_show_classical_fallback(monkeypatch):
@@ -123,19 +123,19 @@ def test_no_feasible_sample_does_not_silently_show_classical_fallback(monkeypatc
                                                     document["exact"])
     monkeypatch.setattr(experiments, "load_saved", lambda config, results_dir=None: deepcopy(document))
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=20).run()
-    selectbox(app, "Allocation shown on the city diagram").select(
-        "Compiler search · best feasible sample").run()
+    selectbox(app, "Show on the map").select(
+        "Quantum: best valid answer").run()
     assert not app.exception
-    assert metric(app, "Selected allocation utility") == "—"
-    assert metric(app, "Constraints") == "No sample"
-    assert any("No sample is available" in item.value for item in app.warning)
+    assert metric(app, "Score") == "—"
+    assert metric(app, "Follows the rules") == "No answer"
+    assert any("gave no valid answer here" in item.value for item in app.warning)
 
-    selectbox(app, "Allocation shown on the city diagram").select(
-        "Compiler search · most frequent raw sample").run()
+    selectbox(app, "Show on the map").select(
+        "Quantum: most common answer").run()
     assert not app.exception
-    assert metric(app, "Constraints") == "Failed"
-    assert metric(app, "Regret vs exact optimum") == "—"
-    assert any("violates the allocation constraints" in item.value for item in app.warning)
+    assert metric(app, "Follows the rules") == "No"
+    assert metric(app, "Points short of best") == "—"
+    assert any("breaks the rules" in item.value for item in app.warning)
 
 
 def test_live_source_change_invalidates_in_session_evidence(saved_app, monkeypatch, tmp_path):
@@ -152,7 +152,7 @@ def test_live_source_change_invalidates_in_session_evidence(saved_app, monkeypat
     app.run()
     assert not app.exception
     assert not app.success
-    assert metric(app, "Quantum feasible sample rate") == "—"
+    assert metric(app, "Valid quantum answers") == "—"
 
 
 @pytest.mark.parametrize("storage_fails", [False, True])

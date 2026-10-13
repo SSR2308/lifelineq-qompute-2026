@@ -4,6 +4,10 @@
 
 All scores, names, coordinates, city diagrams and hardware noise are **synthetic**. Utility is a proxy, not people saved, electricity delivered or a validated emergency plan. Each unit supports one shelter for a fixed period. Electrical sizing, travel and changing demand are outside this prototype. No real quantum hardware, account, GPU, API key or paid service is required.
 
+## Why we built this
+
+Heat waves in Los Angeles are getting more frequent, and a blackout during one turns cooling shelters into a safety issue. Deciding which shelters get the few backup generators is a hard call that depends on values, not just math. We wanted to know whether a quantum optimizer could help make that call, and how you would know whether to trust its answer.
+
 ## Team
 
 - **[Alexander Jacob](https://www.linkedin.com/in/alexander-jacob-0471aa295/)**
@@ -43,7 +47,7 @@ Figures are drawn from the checked-in results by `python scripts/make_figures.py
 
 ## Run locally
 
-The tested environment is **Python 3.10.11 on Windows**, with Qiskit 2.5.2, Qiskit Aer 0.17.2, NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3, Plotly 7.1.0, Streamlit 1.65.0 and pytest 9.1.1. Run commands from the repository root. Top-level dependencies are pinned in `requirements.txt`; `requirements-lock.txt` records the full tested environment. A virtual environment keeps the project independent of other Python installations. The macOS/Linux instructions use the same pinned packages, but those operating systems were not tested in this build.
+The tested environment is **Python 3.10.11 on Windows**, with Qiskit 2.5.2, Qiskit Aer 0.17.2, NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3, Plotly 7.1.0, Streamlit 1.65.0 and pytest 9.1.1. Run commands from the repository root. Top-level dependencies are pinned in `requirements.txt`; `requirements-lock.txt` records the full tested environment. A virtual environment keeps the project independent of other Python installations. The app has also been run on macOS with Python 3.10 in a conda environment; Linux uses the same steps but was not tested.
 
 Windows PowerShell, without needing to change script execution policy:
 
@@ -199,7 +203,7 @@ Individual probability intervals are 95% Wilson intervals for finite-shot uncert
 
 ## Measured results
 
-The completed benchmark and robustness grids contain **90 fits, 630 quantum executions and 90 uniform-feasible executions**, with 2,048 shots each. All 90 experiment runs completed without an execution error. The [generated measurement report](results/REPORT.md) records their exact source hash, versions, costs, paired compiler effects and individual shot intervals. Reproduce that report with `python scripts/summarize_results.py`; it rejects stale or mismatched artifacts. Earlier development runs are retained under `results/archive/development-runs/` and excluded from these results.
+The completed benchmark and robustness grids contain **90 fits, 630 quantum executions and 90 uniform-feasible executions**, with 2,048 shots each. All 90 experiment runs completed without an execution error. The [generated measurement report](results/REPORT.md) records their exact source hash, versions, costs, paired compiler effects and individual shot intervals. Reproduce that report with `python scripts/summarize_results.py`; it rejects stale or mismatched artifacts.
 
 The table below fixes **base scenario, lambda=1, K=3**, whose exact utility is 36. Each entry is the **mean ± sample standard deviation across five independent fit/evaluation seeds**; these are not confidence intervals. “Ideal” is the unrouted noiseless reference. “High” uses the documented high-noise preset.
 
@@ -225,9 +229,7 @@ No quantum execution had zero feasible samples. COBYLA reported convergence succ
 
 Verified on October 12, 2026: **89 tests passed** (`python -m pytest -q`, 8.24 seconds on the tested environment). Coverage includes all-bitstring energy equivalence, bit ordering and routed measurement decoding, impossible inputs and tied optima, zero-noise behavior and count totals, selection/empty-feasible/regret behavior, cache invalidation when scenarios or settings change, preservation of partial failed attempts, and the app's saved/live configuration handling. A browser smoke check also loaded saved benchmark results and completed a live QAOA run with its live-source label.
 
-The [7-minute presentation outline](docs/PRESENTATION.md) gives the demonstration order. [Explain and defend LifelineQ](docs/DEFENSE.md) covers the quantum concepts, design tradeoffs and likely questions. [References and attribution](docs/REFERENCES.md) gives exact primary sources. No starter notebook was copied.
-
-The [official challenge](https://github.com/sandraalhames/Qompute-2026) lists the submission as a 5–10 minute video plus repository and the deadline as October 14, 2026, 11:59 PM “PST.” Target recording and submission earlier that day; do not rely on the organizer's daylight-time wording for an extra hour.
+The [FAQ](docs/FAQ.md) answers common questions in plain language. [References and attribution](docs/REFERENCES.md) lists the primary sources. No starter notebook was copied. Built for the [Qompute 2026 challenge](https://github.com/sandraalhames/Qompute-2026).
 
 ## Limits and deferred work
 
