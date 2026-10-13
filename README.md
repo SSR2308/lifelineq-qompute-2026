@@ -102,7 +102,7 @@ All other overlap entries are zero. A selected pair loses overlap utility to dis
 
 ```math
 U_\lambda(x)=\sum_i (b_i+\lambda v_i)x_i
- -\rho\sum_{i<j}r_{ij}x_ix_j,
+ -\rho\sum_{i\lt j}r_{ij}x_ix_j,
 \quad \sum_i x_i=K,\quad x_6+x_7\ge1.
 ```
 
@@ -126,7 +126,7 @@ Let `s_i=b_i+lambda*v_i`. Minimize
 
 ```math
 E(x)=-U_\lambda(x)+P(\sum_i x_i-K)^2+P(1-x_6)(1-x_7),
-\qquad P=1+\sum_i|s_i|+\rho\sum_{i<j}|r_{ij}|.
+\qquad P=1+\sum_i|s_i|+\rho\sum_{i\lt j}|r_{ij}|.
 ```
 
 For any two binary assignments, each linear or quadratic monomial changes by at most one. Their utility difference is therefore at most `B=sum |s_i| + rho*sum |r_ij|`. Every infeasible assignment incurs at least `P=1+B`, whereas a feasible one has zero penalty. Thus every infeasible assignment costs more than every feasible one. Input validation rejects impossible allocations and invalid weights. This guarantee concerns the global minimum, not every sample of a shallow approximate circuit.
@@ -144,7 +144,7 @@ d_{ij}&=\rho r_{ij}+2P+P\,\mathbf1_{(i,j)=(6,7)}.
 For `x_i=(1-Z_i)/2`, the diagonal cost is `E=offset+sum h_i*Z_i+sum J_ij*Z_i*Z_j`, where
 
 ```math
-\mathrm{offset}=c+\frac12\sum_i a_i+\frac14\sum_{i<j}d_{ij},\qquad
+\mathrm{offset}=c+\frac12\sum_i a_i+\frac14\sum_{i\lt j}d_{ij},\qquad
 h_i=-\frac{a_i}{2}-\frac14\sum_{j\ne i}d_{ij},\qquad
 J_{ij}=\frac{d_{ij}}4.
 ```
