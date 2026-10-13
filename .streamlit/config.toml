@@ -1,0 +1,60 @@
+# Visual theme for the LifelineQ demo. Fonts are served locally from static/fonts
+# (IBM Plex, SIL Open Font License), so the app looks the same offline.
+
+[server]
+enableStaticServing = true
+
+[client]
+toolbarMode = "minimal"
+
+[theme]
+base = "dark"
+primaryColor = "#FFB23F"
+backgroundColor = "#0F1A2B"
+secondaryBackgroundColor = "#17263D"
+textColor = "#E6ECF4"
+borderColor = "#26395A"
+linkColor = "#FFB23F"
+baseRadius = "6px"
+showWidgetBorder = true
+font = "'IBM Plex Sans', system-ui, sans-serif"
+headingFont = "'IBM Plex Sans Condensed', 'IBM Plex Sans', system-ui, sans-serif"
+codeFont = "'IBM Plex Mono', ui-monospace, monospace"
+headingFontWeights = [700, 600, 600, 600, 600, 600]
+metricValueFontWeight = 600
+chartCategoricalColors = ["#FFB23F", "#6CC4E6", "#A99BFF", "#7E8DA6"]
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans"
+url = "app/static/fonts/ibm-plex-sans-latin-400-normal.woff2"
+weight = 400
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans"
+url = "app/static/fonts/ibm-plex-sans-latin-500-normal.woff2"
+weight = 500
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans"
+url = "app/static/fonts/ibm-plex-sans-latin-600-normal.woff2"
+weight = 600
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans Condensed"
+url = "app/static/fonts/ibm-plex-sans-condensed-latin-600-normal.woff2"
+weight = 600
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans Condensed"
+url = "app/static/fonts/ibm-plex-sans-condensed-latin-700-normal.woff2"
+weight = 700
+
+[[theme.fontFaces]]
+family = "IBM Plex Mono"
+url = "app/static/fonts/ibm-plex-mono-latin-400-normal.woff2"
+weight = 400
+
+[theme.sidebar]
+backgroundColor = "#0B1422"
+secondaryBackgroundColor = "#17263D"
+borderColor = "#26395A"

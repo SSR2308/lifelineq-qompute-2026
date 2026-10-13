@@ -13,6 +13,7 @@ import traceback
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.io as pio
 from plotly.subplots import make_subplots
 import streamlit as st
 
@@ -38,12 +39,85 @@ METHOD_NAMES = {
     "uniform_feasible": "Uniform feasible random",
 }
 NOISE_NAMES = {"zero": "Zero noise", "low": "Low noise", "high": "High noise"}
+# Blackout palette: the city is dark; a shelter with power glows like a sodium streetlight.
+NIGHT, PANEL, LINE = "#0F1A2B", "#17263D", "#26395A"
+TEXT, MUTED, DIM = "#E6ECF4", "#8FA1BC", "#3A4C68"
+LIT, COOL, VIOLET, CLASSICAL = "#FFB23F", "#6CC4E6", "#A99BFF", "#7E8DA6"
 METHOD_COLORS = {
-    "ideal": "#7c3aed",
-    "ordinary": "#0284c7",
-    "searched": "#0d9488",
-    "uniform_feasible": "#d97706",
+    "ideal": VIOLET,
+    "ordinary": COOL,
+    "searched": LIT,
+    "uniform_feasible": CLASSICAL,
 }
+
+pio.templates["lifeline"] = go.layout.Template(layout={
+    "font": {"family": "IBM Plex Sans, system-ui, sans-serif", "color": TEXT, "size": 13},
+    "paper_bgcolor": NIGHT, "plot_bgcolor": NIGHT,
+    "colorway": [LIT, COOL, VIOLET, CLASSICAL],
+    "xaxis": {"gridcolor": LINE, "linecolor": LINE, "zerolinecolor": LINE,
+              "tickfont": {"color": MUTED}, "title": {"font": {"color": MUTED}}, "automargin": True},
+    "yaxis": {"gridcolor": LINE, "linecolor": LINE, "zerolinecolor": LINE, "automargin": True,
+              "tickfont": {"color": MUTED}, "title": {"font": {"color": MUTED}, "standoff": 12}},
+    "legend": {"font": {"color": MUTED}, "bgcolor": "rgba(0,0,0,0)"},
+    "hoverlabel": {"bgcolor": PANEL, "bordercolor": LINE,
+                   "font": {"family": "IBM Plex Sans, sans-serif", "color": TEXT}},
+    "annotationdefaults": {"font": {"color": TEXT, "size": 13}},
+})
+pio.templates.default = "lifeline"
+
+
+def chart(fig: go.Figure, **kwargs) -> None:
+    """Render with the app's own Plotly template instead of Streamlit's chart theme."""
+    # Streamlit fills unset backgrounds with its panel color, so set both explicitly.
+    fig.update_layout(template=pio.templates["lifeline"], paper_bgcolor=NIGHT,
+                      plot_bgcolor=fig.layout.plot_bgcolor or NIGHT)
+    st.plotly_chart(fig, width="stretch", theme=None,
+                    config={"displayModeBar": False, **kwargs.pop("config", {})}, **kwargs)
+
+
+STYLE = f"""<style>
+.block-container {{padding-top: 1.25rem; padding-bottom: 3rem; max-width: 1280px;}}
+[data-testid="stDecoration"] {{display: none;}}
+.lq-bar {{display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+  border-bottom: 1px solid {LINE}; padding: .5rem 0 .9rem;}}
+.lq-mark {{font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; font-size: 1.4rem;
+  letter-spacing: -.01em; color: {TEXT};}}
+.lq-meta {{color: {MUTED}; font-size: .9rem; display: flex; flex-wrap: wrap; gap: .25rem 1.25rem;}}
+.lq-meta a {{color: {MUTED}; text-decoration: none; border-bottom: 1px solid {LINE};}}
+.lq-meta a:hover, .lq-meta a:focus-visible {{color: {LIT}; border-color: {LIT};}}
+.stMarkdown p.lq-headline {{font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700;
+  font-size: clamp(1.9rem, 3.3vw, 2.9rem); line-height: 1.06; letter-spacing: -.015em;
+  max-width: 24ch; margin: 1.75rem 0 .9rem; color: {TEXT};}}
+.stMarkdown p.lq-lede {{max-width: 62ch; font-size: 1.1rem; line-height: 1.55; color: #C4CFDF; margin: 0 0 .5rem;}}
+.stMarkdown p.lq-note {{max-width: 62ch; font-size: .875rem; color: {MUTED}; margin: 0 0 1.5rem;}}
+.stMarkdown p.lq-foot {{color: {MUTED}; font-size: .85rem; border-top: 1px solid {LINE}; padding-top: 1rem; margin-top: 2rem;}}
+[data-testid="stMetric"] {{border-top: 1px solid {LINE}; padding-top: .6rem;}}
+[data-testid="stMetricLabel"] p {{color: {MUTED}; font-size: .85rem;}}
+[data-testid="stAlert"] > div {{background: {PANEL}; border: 1px solid {LINE}; color: {TEXT};}}
+.stTabs [data-baseweb="tab"] p {{font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 600;
+  font-size: 1.05rem;}}
+h2, h3 {{letter-spacing: -.01em;}}
+[data-testid="stBaseButton-primary"], [data-testid="stBaseButton-primary"] p {{color: {NIGHT}; font-weight: 600;}}
+@media (max-width: 640px) {{.block-container {{padding-top: 3.5rem;}} .lq-bar {{flex-direction: column;}}}}
+</style>"""
+
+
+def hero(scenario, k: int) -> None:
+    words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"]
+    spell = lambda value: words[value] if value < len(words) else str(value)
+    n = spell(len(scenario.names))
+    units = "One backup generator" if k == 1 else f"{spell(k)} backup generators"
+    st.markdown(f"""
+<div class="lq-bar">
+  <span class="lq-mark">LifelineQ</span>
+  <span class="lq-meta"><span>Qompute 2026, Track 2: Optimizing for People</span>
+    <a href="https://github.com/SSR2308/lifelineq-qompute-2026" target="_blank">Source on GitHub</a></span>
+</div>
+<p class="lq-headline">{n} cooling shelters lost power. {units}. Who gets one?</p>
+<p class="lq-lede">A heat wave has triggered a blackout. LifelineQ solves the allocation exactly, then
+asks a simulated, noisy quantum computer the same question, so you can see whether its answer can be trusted.</p>
+<p class="lq-note">The city and its scores are fictional. Quantum runs are local Qiskit simulations, not IBM hardware.</p>
+""", unsafe_allow_html=True)
 
 
 def configuration(scenario_name: str, weight: float, k: int, p: int, *, live: bool = False,
@@ -95,22 +169,32 @@ def city_figure(scenario, bits: list[int], weight: float) -> go.Figure:
     for i, j, overlap in scenario.overlaps:
         figure.add_trace(go.Scatter(
             x=[coords[i, 0], coords[j, 0]], y=[coords[i, 1], coords[j, 1]],
-            mode="lines", line={"color": "#cbd5e1", "width": 1 + overlap / 4},
+            mode="lines", line={"color": LINE, "width": 1 + overlap / 3, "dash": "dot"},
             hoverinfo="text", text=f"Overlapping service proxy: {overlap:g}",
             showlegend=False,
         ))
-    for selected, label, color in [(False, "No backup unit", "#cbd5e1"),
-                                    (True, "Receives backup unit", "#0d9488")]:
+    lit = [i for i, value in enumerate(bits) if value]
+    if lit:
+        # Soft halo under each powered shelter; purely visual, carries no extra data.
+        for size, alpha in ((96, .07), (70, .12), (50, .2)):
+            figure.add_trace(go.Scatter(
+                x=[coords[i, 0] for i in lit], y=[coords[i, 1] for i in lit], mode="markers",
+                marker={"size": size, "color": f"rgba(255,178,63,{alpha})", "line": {"width": 0}},
+                hoverinfo="skip", showlegend=False,
+            ))
+    for selected, label, color, edge, ink in [
+            (False, "No backup unit", NIGHT, DIM, MUTED),
+            (True, "Receives backup unit", LIT, "#FFE2AE", TEXT)]:
         indices = [i for i, value in enumerate(bits) if bool(value) == selected]
         if not indices:
             continue
         figure.add_trace(go.Scatter(
             x=[coords[i, 0] for i in indices], y=[coords[i, 1] for i in indices],
             mode="markers+text", name=label,
-            text=[f"{i}: {scenario.names[i]}" + (" ★" if i in scenario.priority_sites else "")
+            text=[scenario.names[i] + (" ★" if i in scenario.priority_sites else "")
                   for i in indices],
-            textposition="top center", textfont={"size": 12, "color": "#334155"},
-            marker={"size": 30, "color": color, "line": {"color": "#ffffff", "width": 3},
+            textposition="top center", textfont={"size": 13, "color": ink},
+            marker={"size": 26, "color": color, "line": {"color": edge, "width": 2},
                     "symbol": ["diamond" if i in scenario.priority_sites else "circle"
                                for i in indices]},
             customdata=[[scenario.benefit[i], scenario.priority[i],
@@ -123,9 +207,10 @@ def city_figure(scenario, bits: list[int], weight: float) -> go.Figure:
         ))
     span = max(float(np.ptp(coords[:, 0])), float(np.ptp(coords[:, 1])), 1)
     figure.update_layout(
-        height=420, margin={"l": 30, "r": 30, "t": 35, "b": 30},
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#f1f5f9",
-        legend={"orientation": "h", "y": -0.06, "x": 0},
+        height=440, margin={"l": 10, "r": 10, "t": 20, "b": 10},
+        plot_bgcolor="#0B1422",
+        legend={"orientation": "h", "y": 1.0, "x": 0.01, "yanchor": "top",
+                "font": {"size": 12, "color": MUTED}},
         xaxis={"visible": False, "range": [float(coords[:, 0].min()) - span * .17,
                                             float(coords[:, 0].max()) + span * .17]},
         yaxis={"visible": False, "range": [float(coords[:, 1].min()) - span * .16,
@@ -174,9 +259,9 @@ def uncertainty_figure(document: dict, noise: str) -> go.Figure:
                          "array": [100 * hi - y], "arrayminus": [y - 100 * lo]},
                 hovertemplate=f"{name}<br>%{{y:.1f}}%<extra></extra>",
             ), row=1, col=col)
-    fig.update_yaxes(range=[-3, 103], ticksuffix="%", gridcolor="#e2e8f0")
-    fig.update_layout(height=340, margin={"l": 25, "r": 25, "t": 45, "b": 20},
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+    fig.update_yaxes(range=[-3, 103], ticksuffix="%")
+    fig.update_xaxes(tickangle=0, automargin=True, tickfont={"size": 11})
+    fig.update_layout(height=360, margin={"l": 25, "r": 25, "t": 45, "b": 20})
     return fig
 
 
@@ -194,7 +279,7 @@ def distribution_figure(execution: dict, scenario, weight: float, k: int,
         rows.append((bitstring, count, score, category))
     rows.sort(key=lambda row: (-row[1], row[0]))
     shown = rows[:18]
-    colors = {"Infeasible": "#94a3b8", "Feasible": "#0d9488", "Exact optimum": "#7c3aed"}
+    colors = {"Infeasible": DIM, "Feasible": COOL, "Exact optimum": LIT}
     fig = go.Figure(go.Bar(
         x=[r[0] for r in shown], y=[r[1] for r in shown],
         marker_color=[colors[r[3]] for r in shown],
@@ -203,9 +288,9 @@ def distribution_figure(execution: dict, scenario, weight: float, k: int,
                        "<br>Utility: %{customdata[0]}<br>%{customdata[1]}<extra></extra>"),
     ))
     fig.update_layout(height=330, xaxis={"type": "category", "tickangle": -45,
-                                        "title": "Qiskit bitstrings · shelter 0 is rightmost"},
-                      yaxis_title="Measured sample count", margin={"l": 30, "r": 15, "t": 15, "b": 80},
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+                                        "title": "Qiskit bitstring (shelter 0 is the rightmost bit)",
+                                        "tickfont": {"family": "IBM Plex Mono, monospace"}},
+                      yaxis_title="Measured sample count", margin={"l": 30, "r": 15, "t": 15, "b": 80})
     return fig
 
 
@@ -235,8 +320,7 @@ def noise_figure(document: dict) -> go.Figure:
     fig.update_yaxes(range=[-3, 103], ticksuffix="%", row=1, col=1)
     fig.update_yaxes(title_text="Utility proxy units", row=1, col=2)
     fig.update_layout(height=340, margin={"l": 30, "r": 25, "t": 45, "b": 30},
-                      legend={"orientation": "h", "y": -.23},
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+                      legend={"orientation": "h", "y": -.23})
     return fig
 
 
@@ -265,7 +349,7 @@ def explanation(scenario, bits: list[int], weight: float, k: int, exact: dict) -
              "Weighted contribution": scenario.benefit[i] + weight * scenario.priority[i],
              "Designated priority site": i in scenario.priority_sites}
             for i in range(len(scenario.names))
-        ]), hide_index=True, width="stretch")
+        ]), hide_index=True)
         base = sum(scenario.benefit[i] * bits[i] for i in range(len(bits)))
         priority = sum(scenario.priority[i] * bits[i] for i in range(len(bits))) * weight
         overlap = scenario.rho * sum(r * bits[i] * bits[j] for i, j, r in scenario.overlaps)
@@ -301,15 +385,15 @@ def priorities_view(scenario, weight: float, k: int) -> None:
           / len(result["optima"]) for result in solved] for i in range(len(scenario.names))]
     fig = go.Figure(go.Heatmap(
         x=grid, y=[f"{i}: {name}" for i, name in enumerate(scenario.names)], z=z,
-        zmin=0, zmax=1, colorscale=[[0, "#f1f5f9"], [.5, "#99f6e4"], [1, "#0d9488"]],
-        colorbar={"title": "Share of<br>tied optima", "tickvals": [0, .5, 1]},
+        zmin=0, zmax=1, colorscale=[[0, "#0B1422"], [.5, "#8A5A1C"], [1, LIT]], xgap=2, ygap=2,
+        colorbar={"title": {"text": "Share of tied optima", "side": "right", "font": {"color": MUTED}},
+                  "tickvals": [0, .5, 1], "tickfont": {"color": MUTED}, "outlinewidth": 0},
         hovertemplate="λ=%{x:.1f}<br>%{y}<br>Selected in %{z:.0%} of tied optima<extra></extra>",
     ))
-    fig.add_vline(x=weight, line_dash="dot", line_color="#7c3aed")
+    fig.add_vline(x=weight, line_dash="dot", line_color=TEXT)
     fig.update_layout(height=370, xaxis_title="Priority weight λ", yaxis={"autorange": "reversed"},
-                      margin={"l": 10, "r": 15, "t": 10, "b": 30},
-                      paper_bgcolor="rgba(0,0,0,0)")
-    st.plotly_chart(fig, width="stretch")
+                      margin={"l": 10, "r": 15, "t": 10, "b": 30})
+    chart(fig)
     st.caption("A filled cell means that shelter is selected in every tied optimum; a partial shade "
                "means only some optima select it. The dotted line is the current λ. Utility values "
                "at different weights encode different priorities and are not a common welfare scale.")
@@ -353,9 +437,10 @@ def optimizer_seed_view(config: ExperimentConfig, noise: str) -> None:
                                     mode="markers", name=METHOD_NAMES[method],
                                     marker={"size": 11, "color": METHOD_COLORS[method]}))
         fig.update_layout(height=260, xaxis_title="Independent optimizer/evaluation seed",
+                          xaxis_type="category",
                           yaxis_title="Feasible sample rate (%)", yaxis_range=[-3, 103],
                           margin={"l": 30, "r": 15, "t": 15, "b": 30})
-        st.plotly_chart(fig, width="stretch")
+        chart(fig)
         st.caption(f"{len(saved)} matching saved runs. These dots capture optimization and execution "
                    "variation together; they are distinct from within-run shot uncertainty. "
                    "No confidence interval over optimizer seeds is inferred from these few runs.")
@@ -375,17 +460,17 @@ def evidence_view(document: dict, scenario, config: ExperimentConfig, noise: str
                "Means are conditional on feasibility; they exclude invalid samples, whose rate is shown "
                "separately. The best of many shots is a demonstration outcome, not typical performance. "
                "Uniform feasible random knows the constraints and draws from the enumerated feasible set.")
-    st.plotly_chart(uncertainty_figure(document, noise), width="stretch")
+    chart(uncertainty_figure(document, noise))
     st.caption("Error bars: 95% Wilson intervals for shot proportions in this run. These intervals "
                "do not include uncertainty from optimizer initialization, model assumptions, or real hardware.")
     method = st.selectbox("Inspect an actual sample distribution", ["searched", "ordinary", "ideal", "uniform_feasible"],
                           format_func=lambda value: METHOD_NAMES[value], key="distribution_method")
     execution = choose_execution(document, method, "zero" if method in ("ideal", "uniform_feasible") else noise)
     if execution:
-        st.plotly_chart(distribution_figure(execution, scenario, config.weight, config.k,
-                                           document["exact"]["utility"]), width="stretch")
-        st.caption("Up to 18 most frequent observed bitstrings. Teal = feasible, purple = exact optimum, "
-                   "gray = constraint violation. Download the JSON for the complete counts; metrics use all shots.")
+        chart(distribution_figure(execution, scenario, config.weight, config.k,
+                                           document["exact"]["utility"]))
+        st.caption("Up to 18 most frequent observed bitstrings. Amber = exact optimum, blue = feasible, "
+                   "dark gray = breaks a constraint. Download the JSON for the complete counts; metrics use all shots.")
         most = execution["metrics"].get("most_frequent")
         best = execution["metrics"].get("best_feasible")
         left, right = st.columns(2)
@@ -411,7 +496,7 @@ def stress_view(document: dict, noise: str) -> None:
     st.subheader("Stress-test quantum noise")
     st.write("The same fitted QAOA angles are frozen across all three noise levels. Both compilation "
              "methods use the same synthetic topology, native gates, noise model, and shot budget.")
-    st.plotly_chart(noise_figure(document), width="stretch")
+    chart(noise_figure(document))
     st.caption("Feasibility error bars show 95% Wilson shot intervals. Conditional regret is undefined "
                "when no feasible sample occurs, leaving a gap. Noise need not worsen each metric monotonically.")
     st.dataframe(cost_table(document, noise), hide_index=True, width="stretch")
@@ -450,22 +535,11 @@ def stress_view(document: dict, noise: str) -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="LifelineQ · Power with priorities", page_icon="⚡", layout="wide")
-    st.markdown("""<style>
-        .block-container {padding-top: 4rem; padding-bottom: 3rem; max-width: 1500px;}
-        h1 {letter-spacing: -.045em;}
-        [data-testid="stMetric"] {background: #f1f5f9; border-radius: 12px; padding: 14px;}
-        [data-testid="stMetricLabel"], [data-testid="stMetricValue"] {color: #0f172a;}
-        .eyebrow {color: #0d9488; font-weight: 700; letter-spacing: .13em; font-size: .76rem;}
-        </style>""", unsafe_allow_html=True)
-    st.markdown('<div class="eyebrow">EIGHT SHELTERS · LIMITED POWER · HUMAN PRIORITIES</div>',
-                unsafe_allow_html=True)
-    st.title("LifelineQ")
-    st.write("Which shelters receive backup power—and how reliable are the quantum samples?")
-    st.caption("SYNTHETIC RESEARCH PROTOTYPE · Fictional city and scores · Local Qiskit simulation")
+    st.set_page_config(page_title="LifelineQ", page_icon=":material/bolt:", layout="wide")
+    st.markdown(STYLE, unsafe_allow_html=True)
 
     with st.sidebar:
-        st.header("Allocation controls")
+        st.subheader("Set up the scenario")
         scenario_name = st.selectbox("Synthetic scenario", ["base", "demand_shift", "overlap_shift"],
                                     format_func=lambda value: value.replace("_", " ").title())
         k = st.slider("Backup units available", min_value=1, max_value=8, value=3)
@@ -476,15 +550,15 @@ def main() -> None:
         p = st.radio("QAOA layers p", [1, 2], horizontal=True)
         st.caption("More layers allow a richer circuit and may require more noisy gates.")
         seed = st.selectbox("Optimizer / evaluation seed", [11, 22, 33, 44, 55])
-        run_clicked = st.button("Run small live experiment", type="primary", width="stretch")
+        run_clicked = st.button("Run a live experiment", type="primary", width="stretch")
         st.caption("Live: 1,024 shots per execution, 2 training starts, up to 60 energy evaluations per "
                    "start, 4 compiler candidates. Both noisy circuits run at all three noise levels.")
         st.divider()
-        st.write("**A verifiable decision experiment**")
         st.caption("The exact classical solution is available instantly. Recorded quantum evidence "
                    "appears only when its inputs, code fingerprint, and dependency versions match.")
 
     scenario = load_scenario(scenario_name)
+    hero(scenario, k)
     saved_config = configuration(scenario_name, weight, k, p, seed=seed)
     live_config = configuration(scenario_name, weight, k, p, live=True, seed=seed)
     identity = live_identity(live_config)
@@ -512,18 +586,19 @@ def main() -> None:
     origin = ""
     config = saved_config
     if live and live["identity"] == identity:
-        document, config, origin = live["document"], live_config, "LIVE RUN · this session"
+        document, config, origin = live["document"], live_config, "Live run from this session"
     else:
         document = load_saved(saved_config, results_dir=RESULTS_DIR)
-        origin = "SAVED BENCHMARK RUN"
+        origin = "Saved benchmark run"
         if document is None:
             document = load_saved(live_config, results_dir=RESULTS_DIR)
-            config, origin = live_config, "SAVED QUICK RUN"
+            config, origin = live_config, "Saved quick run"
 
     exact = document["exact"] if document else exact_solution(scenario, weight, k)
     if document:
-        st.success(f"{origin} · λ={weight:g} · K={k} · p={p} · seed={seed} · "
-                   f"{config.shots:,} shots per execution · viewing {NOISE_NAMES[noise].lower()}")
+        layers = "1 layer" if p == 1 else f"{p} layers"
+        st.success(f"{origin}: λ = {weight:g}, {k} units, {layers}, seed {seed}, "
+                   f"{config.shots:,} shots per execution. Showing {NOISE_NAMES[noise].lower()} results.")
     else:
         st.info("No matching quantum evidence is saved for these controls. The diagram below shows "
                 "the exact classical allocation. Run a small live experiment to collect quantum samples.")
@@ -550,9 +625,9 @@ def main() -> None:
         with city:
             if no_sample:
                 st.warning("No sample is available for this selection. Empty nodes are not a recommended allocation.")
-            st.plotly_chart(city_figure(scenario, display_bits, weight), width="stretch", config={"displayModeBar": False})
-            st.caption("Fictional city diagram · ★ and diamond = designated priority shelter · "
-                       "Lines indicate the modeled service overlap, not roads or electrical connections.")
+            chart(city_figure(scenario, display_bits, weight))
+            st.caption("Fictional city. Diamonds marked ★ are designated priority shelters. Dotted lines "
+                       "join shelters whose service areas overlap; they are not roads or power lines.")
             if not no_sample:
                 st.write(f"**Receives power:** {allocation_label(display_bits, scenario)}")
         with statistics:
@@ -595,8 +670,9 @@ def main() -> None:
                                  file_name=f"{filename}.json", mime="application/json", width="stretch")
             right.download_button("Download metrics CSV", pd.DataFrame(results_rows(document)).to_csv(index=False),
                                   file_name=f"{filename}.csv", mime="text/csv", width="stretch")
-    st.caption("LifelineQ · Auditable optimization, explicit priorities, measured uncertainty. "
-               "A research prototype for human discussion; no production emergency-use claim.")
+    st.markdown('<p class="lq-foot">LifelineQ is a research prototype built for Qompute 2026 by '
+                'Alexander Jacob and Shravan Suresh. It is meant to support discussion, not to make '
+                'real emergency decisions.</p>', unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

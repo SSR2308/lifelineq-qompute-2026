@@ -58,7 +58,7 @@ def selectbox(app, label):
 
 def test_saved_evidence_is_visible_and_controls_clear_mismatched_data(saved_app):
     app, document = saved_app
-    assert "SAVED BENCHMARK RUN" in app.success[0].value
+    assert "Saved benchmark run" in app.success[0].value
     assert metric(app, "Selected allocation utility") == "36.00"
     assert len(app.get("download_button")) == 2
     assert {tab.label for tab in app.tabs} == {
@@ -94,13 +94,13 @@ def test_live_run_survives_noise_selection_but_not_changed_allocation(saved_app,
     monkeypatch.setattr(experiments, "save_result", save_record)
     app.button[0].click().run()
     assert not app.exception
-    assert "LIVE RUN" in app.success[0].value
+    assert "Live run" in app.success[0].value
     assert "1,024 shots" in app.success[0].value
     assert len(captured) == 1
 
     selectbox(app, "Evaluation noise").select("high").run()
     assert not app.exception
-    assert "LIVE RUN" in app.success[0].value
+    assert "Live run" in app.success[0].value
     searched = next(row for row in quick["executions"]
                     if row["method"] == "searched" and row["noise"] == "high")
     assert metric(app, "Quantum feasible sample rate") == f"{100 * searched['metrics']['feasible_rate']:.1f}%"
@@ -144,7 +144,7 @@ def test_live_source_change_invalidates_in_session_evidence(saved_app, monkeypat
     monkeypatch.setattr(experiments, "run_experiment", lambda config: deepcopy(quick))
     monkeypatch.setattr(experiments, "save_result", lambda document, results_dir=None: tmp_path / "live.json")
     app.button[0].click().run()
-    assert "LIVE RUN" in app.success[0].value
+    assert "Live run" in app.success[0].value
 
     import lifelineq.provenance as provenance
     monkeypatch.setattr(provenance, "source_hash", lambda: "changed-computational-source")
@@ -178,7 +178,7 @@ def test_live_failure_keeps_partial_evidence_and_reports_original_error(
     app.button[0].click().run()
     assert not app.exception
     assert any("noisy execution stopped" in item.value for item in app.error)
-    assert not any("LIVE RUN" in item.value for item in app.success)
+    assert not any("Live run" in item.value for item in app.success)
     if storage_fails:
         assert any("failure record could not be saved" in item.value for item in app.warning)
     else:
