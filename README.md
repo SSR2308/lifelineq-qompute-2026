@@ -4,6 +4,11 @@
 
 All scores, names, coordinates, city diagrams and hardware noise are **synthetic**. Utility is a proxy, not people saved, electricity delivered or a validated emergency plan. Each unit supports one shelter for a fixed period. Electrical sizing, travel and changing demand are outside this prototype. No real quantum hardware, account, GPU, API key or paid service is required.
 
+## Team
+
+- **[Alexander Jacob](https://www.linkedin.com/in/alexander-jacob-0471aa295/)**
+- **Shravan**
+
 ## Run locally
 
 The tested environment is **Python 3.10.11 on Windows**, with Qiskit 2.5.2, Qiskit Aer 0.17.2, NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3, Plotly 7.1.0, Streamlit 1.65.0 and pytest 9.1.1. Run commands from the repository root. Top-level dependencies are pinned in `requirements.txt`; `requirements-lock.txt` records the full tested environment. A virtual environment keeps the project independent of other Python installations. The macOS/Linux instructions use the same pinned packages, but those operating systems were not tested in this build.
