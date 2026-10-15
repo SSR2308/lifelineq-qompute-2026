@@ -1,5 +1,6 @@
 # LifelineQ
 **Demo video:** https://youtu.be/_9qKbvbUcPQ
+
 **An auditable quantum allocation experiment for Qompute 2026, Track 2: Optimizing for People.** Scenario: during a heat wave, a blackout cuts power to eight cooling shelters in a fictional city. The shelters need backup power, but only three identical compatible units are available. At least one designated priority shelter must receive a unit. LifelineQ shows how explicit priorities, shallow QAOA circuits, compilation and controlled noise affect the resulting allocation distribution.
 
 All scores, names, coordinates, city diagrams and hardware noise are **synthetic**. Utility is a proxy, not people saved, electricity delivered or a validated emergency plan. Each unit supports one shelter for a fixed period. Electrical sizing, travel and changing demand are outside this prototype. No real quantum hardware, account, GPU, API key or paid service is required.
